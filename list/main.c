@@ -18,35 +18,29 @@ pthread_cond_t cond_signal = PTHREAD_COND_INITIALIZER;
 
 static void wait_for_signal()
 {
-    int rc = 0;
-    rc = pthread_mutex_lock(&mutex_signal);
-    DIE(rc != 0, "pthread_mutex_lock");
+    mutex_lock(&mutex_signal);
 
     while (signal == 0)
     {
-        rc = pthread_cond_wait(&cond_signal, &mutex_signal);
+        int rc = pthread_cond_wait(&cond_signal, &mutex_signal);
         DIE(rc != 0, "pthread_cond_wait");
     }
 
-    rc = pthread_mutex_unlock(&mutex_signal);
-    DIE(rc != 0, "pthread_mutex_unlock");
+    mutex_unlock(&mutex_signal);
 }
 
 static void set_signal()
 {
-    int rc = 0;
-    rc = pthread_mutex_lock(&mutex_signal);
-    DIE(rc != 0, "pthread_mutex_lock");
+    mutex_lock(&mutex_signal);
 
     signal = 1;
-    rc = pthread_cond_broadcast(&cond_signal);
+    int rc = pthread_cond_broadcast(&cond_signal);
     DIE(rc != 0, "pthread_cond_broadcast");
-    
-    rc = pthread_mutex_unlock(&mutex_signal);
-    DIE(rc != 0, "pthread_mutex_unlock");
+
+    mutex_unlock(&mutex_signal);
 }
 
-void *task_1(void *args)
+static void *task_1(void *args)
 {
     wait_for_signal();
 
@@ -54,7 +48,7 @@ void *task_1(void *args)
 
     th_add_node(list, 2);
     th_add_node(list, 4);
-    //sleep(0.5);
+    // sleep(0.5);
     th_add_node(list, 10);
     th_delete_node(list, 2);
     th_sort_list(list);
@@ -64,7 +58,7 @@ void *task_1(void *args)
     return NULL;
 }
 
-void *task_2(void *args)
+static void *task_2(void *args)
 {
     wait_for_signal();
 
@@ -74,22 +68,24 @@ void *task_2(void *args)
     th_add_node(list, 1);
     th_delete_node(list, 11);
     th_add_node(list, 8);
-    //sleep(0.5);
-    th_print_list(list);
+    // sleep(0.5);
+    th_print_list(*list);
 
     return NULL;
 }
 
-void *task_3(void *args)
+static void *task_3(void *args)
 {
+    wait_for_signal();
+
     NODE **list = (NODE **)args;
 
     th_add_node(list, 30);
     th_add_node(list, 25);
     th_add_node(list, 100);
     th_sort_list(list);
-    th_print_list(list);
-    //sleep(0.5);
+    th_print_list(*list);
+    // sleep(0.5);
     th_delete_node(list, 100);
 
     return NULL;

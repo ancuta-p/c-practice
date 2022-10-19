@@ -15,5 +15,5 @@ th_list.o: th_list.c th_list.h
 
 clean:
 	-rm -f main 
-	-rm -f list.o main.o
+	-rm -f list.o main.o th_list.o
 	-rm -f *~

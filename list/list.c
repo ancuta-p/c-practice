@@ -6,12 +6,12 @@
 #define RES_NOT_FOUND -1
 #define RES_SUCCESS 0
 
-static void print_node(NODE *self)
+static void print_node(const NODE *self)
 {
     printf("%d ", self->val);
 }
 
-static NODE *init_node(int val)
+static NODE *init_node(const int val)
 {
     NODE *node = NULL;
     node = (NODE *)malloc(sizeof(NODE));
@@ -24,12 +24,12 @@ static NODE *init_node(int val)
     return node;
 }
 
-static int is_empty(NODE *list)
+static int is_empty(const NODE *list)
 {
     return NULL == list;
 }
 
-void add_node(NODE **list, int val)
+void add_node(NODE **list, const int val)
 {
     NODE *node = init_node(val);
 
@@ -46,7 +46,7 @@ void add_node(NODE **list, int val)
     it->next = node;
 }
 
-int delete_node(NODE **list, int val)
+int delete_node(NODE **list, const int val)
 {
     if (is_empty(*list))
         return RES_NOT_FOUND;
@@ -59,7 +59,6 @@ int delete_node(NODE **list, int val)
     {
         *list = (*list)->next;
         free(it);
-        it = NULL;
 
         return RES_SUCCESS;
     }
@@ -82,7 +81,7 @@ int delete_node(NODE **list, int val)
     return RES_SUCCESS;
 }
 
-void print_list(NODE *list)
+void print_list(const NODE *list)
 {
     if (is_empty(list))
     {
@@ -90,13 +89,11 @@ void print_list(NODE *list)
         return;
     }
 
-    NODE *it = list;
-
     printf("( ");
-    while (it != NULL)
+    while (list != NULL)
     {
-        it->callback_print(it);
-        it = it->next;
+        list->callback_print(list);
+        list = list->next;
     }
     printf(")\n");
 }
@@ -120,7 +117,7 @@ void sort_list(NODE **list)
                 it->val = next->val;
                 next->val = val;
 
-                void (*callback)(NODE *) = it->callback_print;
+                void (*callback)(const NODE *) = it->callback_print;
                 it->callback_print = next->callback_print;
                 next->callback_print = callback;
             }
@@ -134,8 +131,8 @@ void flush_list(NODE **list)
 
     while (!is_empty(*list))
     {
+        node = *list;
         *list = (*list)->next;
         free(node);
-        node = NULL;
     }
 }
